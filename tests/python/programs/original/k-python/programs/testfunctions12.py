@@ -1,5 +1,5 @@
 def a(* x, **y):
-  assert x == ()
-  assert y == {}
+  assert not x
+  assert not y
 
 assert a() is None

@@ -6,7 +6,6 @@ while True:
   try:
     chk = 'in loop'
     continue
-    chk = 'better-not-be-this'
   finally:
     if chk == 'in loop':
       chk = 'saw while'

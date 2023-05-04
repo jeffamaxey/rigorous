@@ -4,4 +4,4 @@ class A:
     return ""
 
 assert format(A(), ":!.[]rsa123") == ""
-assert "{::!.[]rsa123}".format(A()) == ""
+assert not "{::!.[]rsa123}".format(A())

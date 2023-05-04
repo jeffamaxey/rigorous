@@ -6,8 +6,7 @@ import unittest
 
 class AugAssignTest(unittest.TestCase):
     def testBasic(self):
-        x = 2
-        x += 1
+        x = 2 + 1
         x *= 2
         x **= 2
         x -= 8
@@ -108,7 +107,7 @@ class AugAssignTest(unittest.TestCase):
         self.assertEqual(x.val, 13)
 
 
-    def testCustomMethods2(test_self):
+    def testCustomMethods2(self):
         output = []
 
         class testall:
@@ -269,7 +268,9 @@ class AugAssignTest(unittest.TestCase):
         1 << x
         x <<= 1
 
-        test_self.assertEqual(output, '''\
+        self.assertEqual(
+            output,
+            '''\
 __add__ called
 __radd__ called
 __iadd__ called
@@ -306,7 +307,8 @@ __irshift__ called
 __lshift__ called
 __rlshift__ called
 __ilshift__ called
-'''.splitlines())
+'''.splitlines(),
+        )
 
 def test_main():
     run_unittest(AugAssignTest)

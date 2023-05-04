@@ -1,8 +1,8 @@
-assert all(()) is True
-assert all((1,)) is True
-assert all((0,)) is False
-assert all((1,2,3,4)) is True
-assert all((1,2,3,4,0)) is False
+assert all(())
+assert all((1,))
+assert not all((0,))
+assert all((1,2,3,4))
+assert not all((1,2,3,4,0))
 
 class A:
   x = 0

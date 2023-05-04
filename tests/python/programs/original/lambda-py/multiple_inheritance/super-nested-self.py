@@ -6,7 +6,8 @@ class A:
 class EE(A):
     def f(self):
         def nested(this):
-            return super().f() + 'E'
+            return f'{super().f()}E'
+
         return nested(self)
 
 ___assertEqual(EE().f(), 'AE')

@@ -5,6 +5,6 @@ class A:
     self.x = x
 
 assert A(0) == A(0)
-assert not(A(0) == A(1))
+assert A(0) != A(1)
 assert A(1) != A(0)
-assert not(A(1) != A(1))
+assert A(1) == A(1)

@@ -1,9 +1,7 @@
 def grange(n):
-	for i in range(n):
-		yield i
+	yield from range(n)
 
 def outergen(n):
-	for i in grange(n):
-		yield i
+	yield from grange(n)
 
 ___assertEqual(list(outergen(10)), list(range(10)))

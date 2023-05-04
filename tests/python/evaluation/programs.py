@@ -106,7 +106,7 @@ def _from_path(
     execution_directory: t.Optional[pathlib.Path] = None,
 ) -> TestCase:
     return TestCase(
-        str("/".join(path.relative_to(programs_directory).parts)),
+        "/".join(path.relative_to(programs_directory).parts),
         path,
         preamble,
         execution_directory,

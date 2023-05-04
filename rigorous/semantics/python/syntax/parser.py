@@ -230,14 +230,13 @@ class _Transformer:
     @_transform.register
     def _transform_comparison(self, node: ast3.Compare) -> tree.Expression:
         left = self.transform_expression(node.left)
-        comparators: t.List[tree.Comparator] = []
-        for operator, value in zip(node.ops, node.comparators):
-            comparators.append(
-                tree.Comparator(
-                    _COMPARISON_OPERATOR_MAP[operator.__class__],
-                    self.transform_expression(value),
-                )
+        comparators: t.List[tree.Comparator] = [
+            tree.Comparator(
+                _COMPARISON_OPERATOR_MAP[operator.__class__],
+                self.transform_expression(value),
             )
+            for operator, value in zip(node.ops, node.comparators)
+        ]
         return tree.Comparison(left, tuple(comparators))
 
     @_transform.register
@@ -335,9 +334,7 @@ class _Transformer:
 
     @_transform.register
     def _transform_raise(self, node: ast3.Raise) -> tree.Statement:
-        exception: t.Optional[tree.Expression] = None
-        if node.exc is not None:
-            exception = self.transform_expression(node.exc)
+        exception = None if node.exc is None else self.transform_expression(node.exc)
         if node.cause is not None:
             raise self.make_unsupported_error(
                 "raise statements with a cause are not supported yet"
@@ -347,9 +344,7 @@ class _Transformer:
     @_transform.register
     def _transform_assert(self, node: ast3.Assert) -> tree.Statement:
         condition = self.transform_expression(node.test)
-        message: t.Optional[tree.Expression] = None
-        if node.msg is not None:
-            message = self.transform_expression(node.msg)
+        message = self.transform_expression(node.msg) if node.msg is not None else None
         return tree.Assert(condition, message)
 
     @_transform.register

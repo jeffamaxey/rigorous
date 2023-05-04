@@ -16,10 +16,7 @@ def isint(x):
 
 def isnum(x):
     """Test whether an object is an instance of a built-in numeric type."""
-    for T in int, float, complex:
-        if isinstance(x, T):
-            return 1
-    return 0
+    return next((1 for T in (int, float, complex) if isinstance(x, T)), 0)
 
 def isRat(x):
     """Test wheter an object is an instance of the Rat class."""
@@ -74,9 +71,8 @@ class Rat(object):
             try:
                 return int(self.__num)
             except OverflowError:
-                raise OverflowError("%s too large to convert to int" %
-                                      repr(self))
-        raise ValueError("can't convert %s to int" % repr(self))
+                raise OverflowError(f"{repr(self)} too large to convert to int")
+        raise ValueError(f"can't convert {repr(self)} to int")
 
     def __add__(self, other):
         """Add two Rats, or a Rat and a number."""
@@ -85,9 +81,7 @@ class Rat(object):
         if isRat(other):
             return Rat(self.__num*other.__den + other.__num*self.__den,
                        self.__den*other.__den)
-        if isnum(other):
-            return float(self) + other
-        return NotImplemented
+        return float(self) + other if isnum(other) else NotImplemented
 
     __radd__ = __add__
 
@@ -98,9 +92,7 @@ class Rat(object):
         if isRat(other):
             return Rat(self.__num*other.__den - other.__num*self.__den,
                        self.__den*other.__den)
-        if isnum(other):
-            return float(self) - other
-        return NotImplemented
+        return float(self) - other if isnum(other) else NotImplemented
 
     def __rsub__(self, other):
         """Subtract two Rats, or a Rat and a number (reversed args)."""
@@ -109,9 +101,7 @@ class Rat(object):
         if isRat(other):
             return Rat(other.__num*self.__den - self.__num*other.__den,
                        self.__den*other.__den)
-        if isnum(other):
-            return other - float(self)
-        return NotImplemented
+        return other - float(self) if isnum(other) else NotImplemented
 
     def __mul__(self, other):
         """Multiply two Rats, or a Rat and a number."""
@@ -119,9 +109,7 @@ class Rat(object):
             return Rat(self.__num*other.__num, self.__den*other.__den)
         if isint(other):
             return Rat(self.__num*other, self.__den)
-        if isnum(other):
-            return float(self)*other
-        return NotImplemented
+        return float(self)*other if isnum(other) else NotImplemented
 
     __rmul__ = __mul__
 
@@ -131,9 +119,7 @@ class Rat(object):
             return Rat(self.__num*other.__den, self.__den*other.__num)
         if isint(other):
             return Rat(self.__num, self.__den*other)
-        if isnum(other):
-            return float(self) / other
-        return NotImplemented
+        return float(self) / other if isnum(other) else NotImplemented
 
     def __rtruediv__(self, other):
         """Divide two Rats, or a Rat and a number (reversed args)."""
@@ -141,9 +127,7 @@ class Rat(object):
             return Rat(other.__num*self.__den, other.__den*self.__num)
         if isint(other):
             return Rat(other*self.__den, self.__num)
-        if isnum(other):
-            return other / float(self)
-        return NotImplemented
+        return other / float(self) if isnum(other) else NotImplemented
 
     def __floordiv__(self, other):
         """Divide two Rats, returning the floored result."""
@@ -190,9 +174,7 @@ class Rat(object):
             return self.__den == 1 and self.__num == other
         if isRat(other):
             return self.__num == other.__num and self.__den == other.__den
-        if isnum(other):
-            return float(self) == other
-        return NotImplemented
+        return float(self) == other if isnum(other) else NotImplemented
 
     def __ne__(self, other):
         """Compare two Rats for inequality."""
@@ -315,10 +297,7 @@ def op_sequence(op, *classes):
     """Return the sequence of operations that results from applying
     the operation `op` to instances of the given classes."""
     log = []
-    instances = []
-    for c in classes:
-        instances.append(c(log.append))
-
+    instances = [c(log.append) for c in classes]
     try:
         op(*instances)
     except TypeError:

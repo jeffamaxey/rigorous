@@ -62,20 +62,19 @@ class object:
         if not lowlevel_isinstance(name, str):
             raise TypeError()
         descriptor = cls_get__set__descriptor(CLS_OF(self), name)
-        if descriptor is SENTINEL:
-            attrs = record_get(LOAD(self), LITERAL("dict"))
-            if attrs is not None:
-                try:
-                    return attrs[name]
-                except KeyError:
-                    pass
-            value = getattribute_type(CLS_OF(self), name, self)
-            if value is SENTINEL:
-                raise AttributeError()
-            else:
-                return value
-        else:
+        if descriptor is not SENTINEL:
             return CALL_SLOT(descriptor, "__get__", self, CLS_OF(self))
+        attrs = record_get(LOAD(self), LITERAL("dict"))
+        if attrs is not None:
+            try:
+                return attrs[name]
+            except KeyError:
+                pass
+        value = getattribute_type(CLS_OF(self), name, self)
+        if value is SENTINEL:
+            raise AttributeError()
+        else:
+            return value
 
     def __setattr__(self, name, value):
         if not lowlevel_isinstance(name, str):
@@ -184,7 +183,7 @@ class type:
     def __init__(self, name, bases, namespace, **kwargs):
         pass
 
-    def __prepare__(name, bases, **kwargs):
+    def __prepare__(self, bases, **kwargs):
         return {}
 
     def __getattribute__(self, name):
@@ -193,8 +192,8 @@ class type:
         value = getattribute_type(self, name, None)
         if value is SENTINEL:
             value = getattribute_type(CLS_OF(self), name, self)
-            if value is SENTINEL:
-                raise AttributeError()
+        if value is SENTINEL:
+            raise AttributeError()
         return value
 
     def __setattr__(self, name, value):
@@ -265,23 +264,15 @@ class str:
         return NEW_FROM_VALUE(str, string_repr(VALUE_OF(self)))
 
     def __bool__(self):
-        if string_length(VALUE_OF(self)) == LITERAL(0):
-            return False
-        return True
+        return string_length(VALUE_OF(self)) != LITERAL(0)
 
     def __str__(self):
-        if CLS_OF(self) is str:
-            return self
-        else:
-            return NEW_FROM_VALUE(str, VALUE_OF(self))
+        return self if CLS_OF(self) is str else NEW_FROM_VALUE(str, VALUE_OF(self))
 
     def __eq__(self, other):
         if CLS_OF(other) is not CLS_OF(self):
             return False
-        if string_equals(VALUE_OF(self), VALUE_OF(other)):
-            return True
-        else:
-            return False
+        return bool(string_equals(VALUE_OF(self), VALUE_OF(other)))
 
     def __add__(self, other):
         if lowlevel_isinstance(other, str):
@@ -334,48 +325,36 @@ class int:
         return self
 
     def __bool__(self):
-        if VALUE_OF(self) != LITERAL(0):
-            return True
-        return False
+        return VALUE_OF(self) != LITERAL(0)
 
     def __hash__(self):
         return NEW_FROM_VALUE(int, number_hash(VALUE_OF(self)))
 
     def __eq__(self, other):
-        if lowlevel_isinstance(other, int):
-            if VALUE_OF(self) == VALUE_OF(other):
-                return True
-            return False
-        else:
-            return NotImplemented
+        return (
+            VALUE_OF(self) == VALUE_OF(other)
+            if lowlevel_isinstance(other, int)
+            else NotImplemented
+        )
 
     def __ne__(self, other):
-        if lowlevel_isinstance(other, int):
-            if VALUE_OF(self) != VALUE_OF(other):
-                return True
-            return False
-        else:
-            return NotImplemented
+        return (
+            VALUE_OF(self) != VALUE_OF(other)
+            if lowlevel_isinstance(other, int)
+            else NotImplemented
+        )
 
     def __lt__(self, other):
-        if VALUE_OF(self) < VALUE_OF(other):
-            return True
-        return False
+        return VALUE_OF(self) < VALUE_OF(other)
 
     def __le__(self, other):
-        if VALUE_OF(self) <= VALUE_OF(other):
-            return True
-        return False
+        return VALUE_OF(self) <= VALUE_OF(other)
 
     def __ge__(self, other):
-        if VALUE_OF(self) >= VALUE_OF(other):
-            return True
-        return False
+        return VALUE_OF(self) >= VALUE_OF(other)
 
     def __gt__(self, other):
-        if VALUE_OF(self) > VALUE_OF(other):
-            return True
-        return False
+        return VALUE_OF(self) > VALUE_OF(other)
 
     def __add__(self, other):
         if lowlevel_isinstance(other, int):
@@ -395,10 +374,7 @@ class int:
 
 class bool(int):
     def __new__(cls, obj=False):
-        if obj:
-            return True
-        else:
-            return False
+        return bool(obj)
 
     def __init__(self, obj=False):
         pass
@@ -407,10 +383,7 @@ class bool(int):
         return self
 
     def __repr__(self):
-        if self:
-            return "True"
-        else:
-            return "False"
+        return "True" if self else "False"
 
 
 class dict:
@@ -425,10 +398,10 @@ class dict:
             )
 
     def __init__(self, *args, **kwargs):
-        if len(args) == 0:
+        if not args:
             for key in kwargs:
                 self[key] = kwargs[key]
-        elif len(args) == 1 and len(kwargs) == 0:
+        elif len(args) == 1 and not kwargs:
             initializer = args[0]
             try:
                 initializer = initializer.items()
@@ -449,34 +422,33 @@ class dict:
             raise ValueError()
 
     def __eq__(self, other):
-        if lowlevel_isinstance(other, dict):
-            self_entries = VALUE_OF(self)
-            other_entries = VALUE_OF(other)
-            length = sequence_length(self_entries)
-            if length != sequence_length(other_entries):
-                return False
-            index = LITERAL(0)
-            while index < length:
-                entry = sequence_get(self_entries, index)
-                key = record_get(entry, LITERAL("key"))
-                value = record_get(entry, LITERAL("value"))
-                other_index = LITERAL(0)
-                while other_index < length:
-                    other_entry = sequence_get(other_entries, other_index)
-                    other_key = record_get(other_entry, LITERAL("key"))
-                    other_value = record_get(other_entry, LITERAL("value"))
-                    if key == other_key:
-                        if value == other_value:
-                            break
-                        else:
-                            return False
-                    other_index = number_add(other_index, LITERAL(1))
-                else:
-                    return False
-                index = number_add(index, LITERAL(1))
-            return True
-        else:
+        if not lowlevel_isinstance(other, dict):
             return NotImplemented
+        self_entries = VALUE_OF(self)
+        other_entries = VALUE_OF(other)
+        length = sequence_length(self_entries)
+        if length != sequence_length(other_entries):
+            return False
+        index = LITERAL(0)
+        while index < length:
+            entry = sequence_get(self_entries, index)
+            key = record_get(entry, LITERAL("key"))
+            value = record_get(entry, LITERAL("value"))
+            other_index = LITERAL(0)
+            while other_index < length:
+                other_entry = sequence_get(other_entries, other_index)
+                other_key = record_get(other_entry, LITERAL("key"))
+                other_value = record_get(other_entry, LITERAL("value"))
+                if key == other_key:
+                    if value == other_value:
+                        break
+                    else:
+                        return False
+                other_index = number_add(other_index, LITERAL(1))
+            else:
+                return False
+            index = number_add(index, LITERAL(1))
+        return True
 
     def __iter__(self):
         return NEW_FROM_VALUE(
@@ -490,9 +462,7 @@ class dict:
         return NEW_FROM_VALUE(int, sequence_length(VALUE_OF(self)))
 
     def __bool__(self):
-        if sequence_length(VALUE_OF(self)) == LITERAL(0):
-            return False
-        return True
+        return sequence_length(VALUE_OF(self)) != LITERAL(0)
 
     def __getitem__(self, key):
         index = dict_find_entry(self, key, VALUE_OF(hash(key)))
@@ -530,19 +500,15 @@ class tuple:
     def __new__(cls, iterable=SENTINEL):
         if iterable is SENTINEL:
             return NEW_FROM_VALUE(cls, LITERAL(()))
-        else:
-            if cls is tuple and CLS_OF(iterable) is tuple:
-                return iterable
-            return NEW_FROM_VALUE(cls, unpack_iterable(iterable))
+        if cls is tuple and CLS_OF(iterable) is tuple:
+            return iterable
+        return NEW_FROM_VALUE(cls, unpack_iterable(iterable))
 
     def __init__(self, iterable=SENTINEL):
         pass
 
     def __contains__(self, obj):
-        for element in self:
-            if element == obj:
-                return True
-        return False
+        return any(element == obj for element in self)
 
     def __repr__(self):
         elements = LITERAL(())
@@ -565,9 +531,11 @@ class tuple:
         )
 
     def __eq__(self, other):
-        if not lowlevel_isinstance(other, tuple):
-            return NotImplemented
-        return runtime_sequence_equals(VALUE_OF(self), VALUE_OF(other))
+        return (
+            runtime_sequence_equals(VALUE_OF(self), VALUE_OF(other))
+            if lowlevel_isinstance(other, tuple)
+            else NotImplemented
+        )
 
     def __hash__(self):
         # https://github.com/python/cpython/blob/3.7/Objects/tupleobject.c#L348
@@ -583,8 +551,7 @@ class tuple:
             x = (x ^ y) * mult
             mult = (mult + (82520 + length + length)) & 0xFFFF_FFFF_FFFF_FFFF
 
-        x = x + 97531
-        return x
+        return x + 97531
 
     def __len__(self):
         return NEW_FROM_VALUE(int, sequence_length(VALUE_OF(self)))
@@ -600,9 +567,7 @@ class tuple:
         )
 
     def __bool__(self):
-        if sequence_length(VALUE_OF(self)) == LITERAL(0):
-            return False
-        return True
+        return sequence_length(VALUE_OF(self)) != LITERAL(0)
 
     def __add__(self, other):
         if lowlevel_isinstance(other, tuple):
@@ -644,14 +609,14 @@ class list:
         return NEW_FROM_VALUE(int, sequence_length(VALUE_OF(self)))
 
     def __bool__(self):
-        if sequence_length(VALUE_OF(self)) == LITERAL(0):
-            return False
-        return True
+        return sequence_length(VALUE_OF(self)) != LITERAL(0)
 
     def __eq__(self, other):
-        if not lowlevel_isinstance(other, list):
-            return NotImplemented
-        return runtime_sequence_equals(VALUE_OF(self), VALUE_OF(other))
+        return (
+            runtime_sequence_equals(VALUE_OF(self), VALUE_OF(other))
+            if lowlevel_isinstance(other, list)
+            else NotImplemented
+        )
 
     def append(self, element):
         SET_VALUE(self, sequence_push(VALUE_OF(self), element))
@@ -812,17 +777,11 @@ def abs(obj):
 
 
 def all(iterable):
-    for element in iterable:
-        if not element:
-            return False
-    return True
+    return all(iterable)
 
 
 def any(iterable):
-    for element in iterable:
-        if element:
-            return True
-    return False
+    return any(iterable)
 
 
 def ascii(obj):
@@ -932,20 +891,14 @@ def input(prompt=None):
 
 def isinstance(obj, classinfo):
     if lowlevel_isinstance(classinfo, tuple):
-        for element in classinfo:
-            if isinstance(obj, element):
-                return True
-        return False
+        return any(isinstance(obj, element) for element in classinfo)
     else:
         return CALL_SLOT(classinfo, "__instancecheck__", obj)
 
 
 def issubclass(cls, classinfo):
     if lowlevel_isinstance(classinfo, tuple):
-        for element in classinfo:
-            if issubclass(cls, element):
-                return True
-        return False
+        return any(issubclass(cls, element) for element in classinfo)
     else:
         return CALL_SLOT(classinfo, "__subclasscheck__", cls)
 
@@ -1118,12 +1071,12 @@ class super:
             if not lowlevel_issubclass(object_or_type, typ):
                 raise TypeError("super(): `object_or_type` is not a subclass of `type`")
             attributes["__self_class__"] = object_or_type
-        else:
-            if not lowlevel_isinstance(object_or_type, typ):
-                raise TypeError(
-                    "super(): `object_or_type` is not an instance of `type`"
-                )
+        elif lowlevel_isinstance(object_or_type, typ):
             attributes["__self_class__"] = CLS_OF(object_or_type)
+        else:
+            raise TypeError(
+                "super(): `object_or_type` is not an instance of `type`"
+            )
         return NEW(RECORD(cls=super, dict=attributes))
 
     def __init__(self, typ=None, object_or_type=None):
@@ -1136,13 +1089,13 @@ class super:
         if VALUE_OF(name) != LITERAL("__class__"):
             attributes = record_get(LOAD(self), LITERAL("dict"))
             start_type = attributes["__self_class__"]
-            this_class = attributes["__thisclass__"]
             if start_type is not None:
                 mro = record_get(LOAD(start_type), LITERAL("mro"))
 
                 # compute offset to `this_class`
                 length = sequence_length(mro)
                 index = LITERAL(0)
+                this_class = attributes["__thisclass__"]
                 while index < length:
                     if sequence_get(mro, index) is this_class:
                         break
@@ -1165,11 +1118,10 @@ class super:
                             descriptor_get = GET_SLOT(value, "__get__")
                             if descriptor_get is None:
                                 return value
-                            else:
-                                instance = attributes["__self__"]
-                                if instance is start_type:
-                                    instance = None
-                                return descriptor_get(value, instance, start_type)
+                            instance = attributes["__self__"]
+                            if instance is start_type:
+                                instance = None
+                            return descriptor_get(value, instance, start_type)
                     index = number_add(index, LITERAL(1))
 
         return object.__getattribute__(self, name)
@@ -1197,14 +1149,13 @@ def __build_class__(func, name, *bases, metaclass=None, **kwargs):
     mcs = extract_metaclass(unpack_iterable(bases))
     if metaclass is None:
         metaclass = mcs
-    else:
-        if lowlevel_isinstance(metaclass, type):
-            if lowlevel_issubclass(metaclass, mcs):
-                mcs = metaclass
-            elif not lowlevel_issubclass(mcs, metaclass):
-                raise TypeError("incompatible meta classes")
-            else:
-                metaclass = mcs
+    elif lowlevel_isinstance(metaclass, type):
+        if lowlevel_issubclass(metaclass, mcs):
+            mcs = metaclass
+        elif not lowlevel_issubclass(mcs, metaclass):
+            raise TypeError("incompatible meta classes")
+        else:
+            metaclass = mcs
 
     prepare = GET_CLS_SLOT(mcs, "__prepare__")
     if prepare is None:

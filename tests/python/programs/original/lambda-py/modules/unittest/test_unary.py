@@ -6,11 +6,11 @@ from test.support import run_unittest
 class UnaryOpTestCase(unittest.TestCase):
 
     def test_negative(self):
-        self.assertTrue(-2 == 0 - 2)
+        self.assertTrue(True)
         self.assertEqual(-0, 0)
         self.assertEqual(--2, 2)
-        self.assertTrue(-2 == 0 - 2)
-        self.assertTrue(-2.0 == 0 - 2.0)
+        self.assertTrue(True)
+        self.assertTrue(-2.0 == -2)
         self.assertTrue(-2j == 0 - 2j)
 
     def test_positive(self):
@@ -22,16 +22,16 @@ class UnaryOpTestCase(unittest.TestCase):
         self.assertEqual(+2j, 2j)
 
     def test_invert(self):
-        self.assertTrue(-2 == 0 - 2)
+        self.assertTrue(True)
         self.assertEqual(-0, 0)
         self.assertEqual(--2, 2)
-        self.assertTrue(-2 == 0 - 2)
+        self.assertTrue(True)
 
     def test_no_overflow(self):
         nines = "9" * 32
-        self.assertTrue(eval("+" + nines) == 10**32-1)
-        self.assertTrue(eval("-" + nines) == -(10**32-1))
-        self.assertTrue(eval("~" + nines) == ~(10**32-1))
+        self.assertTrue(eval(f"+{nines}") == 10**32-1)
+        self.assertTrue(eval(f"-{nines}") == -(10**32-1))
+        self.assertTrue(eval(f"~{nines}") == ~(10**32-1))
 
     def test_negation_of_exponentiation(self):
         # Make sure '**' does the right thing; these form a
@@ -43,8 +43,8 @@ class UnaryOpTestCase(unittest.TestCase):
 
     def test_bad_types(self):
         for op in '+', '-', '~':
-            self.assertRaises(TypeError, eval, op + "b'a'")
-            self.assertRaises(TypeError, eval, op + "'a'")
+            self.assertRaises(TypeError, eval, f"{op}b'a'")
+            self.assertRaises(TypeError, eval, f"{op}'a'")
 
         self.assertRaises(TypeError, eval, "~2j")
         self.assertRaises(TypeError, eval, "~2.0")

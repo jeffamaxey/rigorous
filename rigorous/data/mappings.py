@@ -58,17 +58,14 @@ def setitem(mapping: Mapping, key: terms.Term, value: terms.Term) -> terms.Term:
 
 @terms.function_operator
 def delitem(mapping: Mapping, key: terms.Term) -> t.Optional[terms.Term]:
-    if key in mapping.entries:
-        return mapping.delitem(key)
-    else:
-        return mapping
+    return mapping.delitem(key) if key in mapping.entries else mapping
 
 
 @terms.operator
 def construct(arguments: terms.Arguments) -> t.Optional[terms.Term]:
     if len(arguments) % 2 != 0:
         return None
-    entries: t.Dict[terms.Term, terms.Term] = {}
-    for key, value in zip(arguments[::2], arguments[1::2]):
-        entries[key] = value
+    entries: t.Dict[terms.Term, terms.Term] = dict(
+        zip(arguments[::2], arguments[1::2])
+    )
     return Mapping(immutables.Map(entries))

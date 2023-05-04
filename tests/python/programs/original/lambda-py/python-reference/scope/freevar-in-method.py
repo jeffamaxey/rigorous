@@ -24,7 +24,7 @@ class Test:
     def test(self):
         return method_and_var
     def actual_global(self):
-        return str("global")
+        return "global"
     def str(self):
         return str(self)
 

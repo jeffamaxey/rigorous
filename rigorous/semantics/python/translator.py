@@ -90,15 +90,14 @@ class Translator:
         if mechanism is blocks.Mechanism.LOCAL:
             return factory.create_load_local(identifier, default=default)
         elif mechanism is blocks.Mechanism.GLOBAL:
-            if self.mode is Mode.PRIMITIVE:
-                if identifier in basis.builtin_constants:
-                    return basis.builtin_constants[identifier]
-                elif identifier in basis.runtime_constants:
-                    return basis.runtime_constants[identifier]
-            else:
+            if self.mode is not Mode.PRIMITIVE:
                 return sugar.create_load_global(
                     self.heap_builder.new_string(identifier)
                 )
+            if identifier in basis.builtin_constants:
+                return basis.builtin_constants[identifier]
+            elif identifier in basis.runtime_constants:
+                return basis.runtime_constants[identifier]
         assert self.mode is not Mode.PRIMITIVE, (
             f"invalid access mechanism {mechanism} for identifier "
             f"{identifier!r} in {self.block_stack.head}"
@@ -510,9 +509,8 @@ class Translator:
     def _translate_loop_control(self, ast: tree.LoopControl) -> terms.Term:
         if ast.kind is tree.LoopControl.Kind.BREAK:
             return factory.create_break()
-        else:
-            assert ast.kind is tree.LoopControl.Kind.CONTINUE
-            return factory.create_continue()
+        assert ast.kind is tree.LoopControl.Kind.CONTINUE
+        return factory.create_continue()
 
     @_translate.register
     def _translate_try(self, ast: tree.Try) -> terms.Term:
@@ -663,14 +661,13 @@ class Translator:
         self, definition: blocks.FunctionDefinition
     ) -> references.Reference:
         with self.block_stack.enter(definition):
-            signature: t.List[records.Record] = []
-            for parameter in definition.parameters:
-                signature.append(
-                    records.create(
-                        name=strings.create(parameter.identifier),
-                        kind=strings.create(parameter.kind.name),
-                    )
+            signature: t.List[records.Record] = [
+                records.create(
+                    name=strings.create(parameter.identifier),
+                    kind=strings.create(parameter.kind.name),
                 )
+                for parameter in definition.parameters
+            ]
             body = factory.create_sequence(
                 self.translate_body(definition.body), factory.create_return(heap.NONE),
             )
@@ -736,9 +733,12 @@ class Translator:
             )
 
     def get_docstring(self, body: t.Sequence[tree.Statement]) -> terms.Term:
-        if body and isinstance(body[0], tree.Evaluate):
-            if isinstance(body[0].expression, tree.String):
-                return self.heap_builder.new_string(body[0].expression.value)
+        if (
+            body
+            and isinstance(body[0], tree.Evaluate)
+            and isinstance(body[0].expression, tree.String)
+        ):
+            return self.heap_builder.new_string(body[0].expression.value)
         return heap.NONE
 
     def translate_module(self, module: blocks.Module) -> terms.Term:

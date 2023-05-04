@@ -1,7 +1,8 @@
 class Descriptor(object):
   def __get__(self, obj, objtype):
     def f(name):
-      return 'got ' + name
+      return f'got {name}'
+
     return f
 
 class B(object):

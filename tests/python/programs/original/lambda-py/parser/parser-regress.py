@@ -28,7 +28,7 @@ def f():
     "\000\777\00\77\0\7"
     "\778\788\888"
     "\x00\xff"
-    
+
     b'hello' b"world"
     'hello' "world"
     b'\n' br'\n'
@@ -91,7 +91,7 @@ def f():
     {x for y in z}
 
     not n
-    
+
     +-o
 
     (1,2)
@@ -111,12 +111,14 @@ def f():
 
     1
     1;
-    1;2
-    1;2;
+    1
+    2
+    1
+    2;
 
     # Indent problems in editor...
     while p: break
-    
+
     while q: continue
 
     r = s
@@ -164,7 +166,7 @@ def f():
     lb = 1
     lc = 1
     ld = 1
-    
+
     def h():
         nonlocal la
         nonlocal lb,lc,ld
@@ -192,7 +194,6 @@ def f():
     except p: pass
     except q: pass
     except: pass
-    else: pass
     finally: pass
 
     try: pass
@@ -202,32 +203,38 @@ def f():
     try: pass
     except t: pass
     except u: pass
-    else: pass
-
     while v: pass
 
     while w: pass
-    else: pass
-
     for a in b: pass
     for c in d: pass
-    else: pass
     for e,f in g,h: pass
 
     def i(): pass
+
     def j(k,l,m): pass
+
     def j(n,o,p,): pass
+
     def q(r,*s): pass
+
     def t(u,v=w): pass
+
     def t(x,y=z,): pass
+
     def a(**b): pass
+
     def c(d,**e): pass
+
     def f(*,g=h): pass
+
     def m(h,i=j,*,k=l,m,**n):pass
+
     def f(a:b, c:d=e, *f:g, h:i, j:k=l, **m:n): pass
 
     @k
     def l(): pass
+
     @m()
     @n(o)
     @p.q(r,s=t,*u,**v)
@@ -238,7 +245,6 @@ def f():
     class u(v,w,): pass
     class x(y,z=a,*b,**c): pass
     class d(): pass
-
     @k
     class l(): pass
     @m()

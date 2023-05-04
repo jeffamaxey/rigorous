@@ -1,8 +1,8 @@
-assert any(()) is False
-assert any((1,)) is True, any((1,))
-assert any((0,)) is False
-assert any((0, 0, 0, 0)) is False
-assert any((0, 0, 0, 1)) is True
+assert not any(())
+assert any((1,)), any((1,))
+assert not any((0,))
+assert not any((0, 0, 0, 0))
+assert any((0, 0, 0, 1))
 
 class A:
   x = 0

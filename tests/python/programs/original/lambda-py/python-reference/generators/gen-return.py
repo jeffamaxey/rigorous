@@ -1,7 +1,6 @@
 def f():
     yield 1
     return
-    yield 3
 
 g = f()
 assert next(g) == 1

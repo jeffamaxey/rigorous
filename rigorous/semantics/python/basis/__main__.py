@@ -58,11 +58,9 @@ def generate_prelude() -> None:
     prelude_file = (pathlib.Path(__file__).parent / "source" / "prelude.py").resolve()
     print(f"Prelude File: {prelude_file.relative_to(pathlib.Path.cwd())}")
 
-    lines: t.List[str] = ["\n\n"]
-
     from . import macros, primitives
 
-    lines.append("# Macros")
+    lines: t.List[str] = ["\n\n", "# Macros"]
     for name in sorted(macros.get_macros()):
         lines.append(f"{name} = ...")
 

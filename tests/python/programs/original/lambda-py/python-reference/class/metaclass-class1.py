@@ -1,5 +1,5 @@
 class Meta(type):
-  def __new__(self, name, bases, dict):
+  def __new__(cls, name, bases, dict):
     dict.__delitem__("x")
     return type(name, bases, dict)
 

@@ -4,7 +4,7 @@ class A:
  
 # super() in an external function with "self" argument
 def external(self):
-    super().f() + 'E'
+    f'{super().f()}E'
 
 class EE(A):
     def f(self):

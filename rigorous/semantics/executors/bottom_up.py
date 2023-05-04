@@ -45,8 +45,7 @@ class TransitionTerm:
 
 
 def decompose_transition(term: terms.Term) -> t.Optional[TransitionTerm]:
-    match = unification.match(_PATTERN, term)
-    if match:
+    if match := unification.match(_PATTERN, term):
         return TransitionTerm(
             source=match[_var_source],
             action=match[_var_action],
@@ -79,7 +78,7 @@ class _DeferredCondition:
             for variable, renamed in self.renaming.items()
             if renamed in substitution
         }
-        environment.update(self.solution)
+        environment |= self.solution
         return environment
 
     def get_verdict(self, substitution: terms.Substitution) -> inference.Verdict:
@@ -167,9 +166,7 @@ class Executor(interface.Executor[Transition]):
             elif verdict is inference.Verdict.SATISFIABLE:
                 conditions.append(_DeferredCondition(condition, renaming, substitution))
 
-        substitution = dict(substitution)
-        substitution.update(renaming)
-
+        substitution = dict(substitution) | renaming
         solver = unification.Solver()
         for (left, right) in rule.original.constraints:
             solver.add_equation(

@@ -1,6 +1,5 @@
 try:
   raise None
-  assert False
 except TypeError:
   x = 13
 assert x == 13

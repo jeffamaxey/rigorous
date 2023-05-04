@@ -1,6 +1,6 @@
 class A:
   def __enter__(self): pass
-  def __exit__(sef, type, value, traceback):
+  def __exit__(self, type, value, traceback):
     return False
 
 def a():

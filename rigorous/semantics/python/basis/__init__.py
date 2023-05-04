@@ -50,9 +50,8 @@ runtime_module = parser.parse_module(runtime_source, mode=parser.Mode.PRIMITIVE)
 def lookup(identifier: str) -> references.Reference:
     if identifier in runtime_constants:
         return runtime_constants[identifier]
-    else:
-        assert identifier in builtin_constants
-        return builtin_constants[identifier]
+    assert identifier in builtin_constants
+    return builtin_constants[identifier]
 
 
 def _forward_declare() -> None:

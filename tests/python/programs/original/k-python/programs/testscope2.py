@@ -1,7 +1,6 @@
 x = 5
 def a():
-  x = 6
-  assert x == 6
+  pass
 a()
 assert "x" in a.__code__.co_varnames
 

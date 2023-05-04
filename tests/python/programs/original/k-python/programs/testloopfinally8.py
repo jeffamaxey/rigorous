@@ -2,8 +2,7 @@ for x in (4, 5, 6):
   try:
     y = x - 1
   finally:
-    break 
-    assert False
+    break
   assert False
 else:
   assert False

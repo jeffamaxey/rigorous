@@ -10,10 +10,7 @@ def memo(func):
 # memoized fib
 @memo
 def fib(n):
-    if n < 2:
-        return n
-    else:
-        return fib(n - 1) + fib(n - 2)
+    return n if n < 2 else fib(n - 1) + fib(n - 2)
 
 # this should work even without memoization
 ___assertEqual(fib(12), 144)

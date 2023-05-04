@@ -9,7 +9,7 @@ gencomp = (x*2+y for x in range(6) for y in [-1, 4, 2, 1, 7] if x > y)
 ___assertEqual(list(fun()), list(gencomp))
 
 def filgen(f, it):
-	if (f == None):
+	if f is None:
 		for x in it:
 			if (x):
 				yield x

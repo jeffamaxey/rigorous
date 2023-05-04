@@ -1,6 +1,7 @@
 # test_metaclass fragment from standard Python test suite
 def test_metaclass():
     # Testing metaclasses...
+
     class C(metaclass=type):
         def __init__(self):
             self.__state = 0
@@ -12,8 +13,13 @@ def test_metaclass():
     ___assertEqual(a.getstate(), 0)
     a.setstate(10)
     ___assertEqual(a.getstate(), 10)
+
+
     class _metaclass(type):
-        def myself(cls): return cls
+        def myself(self):
+            return self
+
+
     class D(metaclass=_metaclass):
         pass
     ___assertEqual(D.myself(), D)

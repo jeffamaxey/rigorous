@@ -24,7 +24,7 @@ format_testfile = os.path.join(test_dir, 'formatfloat_testcases.txt')
 class GeneralFloatCases(unittest.TestCase):
 
     def test_float(self):
-        self.assertEqual(float(3.14), 3.14)
+        self.assertEqual(3.14, 3.14)
         self.assertEqual(float(314), 314.0)
         self.assertEqual(float("  3.14  "), 3.14)
         self.assertEqual(float(b" 3.14  "), 3.14)
@@ -69,7 +69,7 @@ class GeneralFloatCases(unittest.TestCase):
         # float must not accept the locale specific decimal point but
         # it still has to accept the normal python syntax
         import locale
-        if not locale.localeconv()['decimal_point'] == ',':
+        if locale.localeconv()['decimal_point'] != ',':
             return
 
         self.assertEqual(float("  3.14  "), 3.14)
@@ -143,25 +143,23 @@ class GeneralFloatCases(unittest.TestCase):
             ]:
             self.assertEqual(f.as_integer_ratio(), ratio)
 
-        for i in range(10000):
+        for _ in range(10000):
             f = random.random()
             f *= 10 ** random.randint(-100, 100)
             n, d = f.as_integer_ratio()
             self.assertEqual(float(n).__truediv__(d), f)
 
         R = fractions.Fraction
-        self.assertEqual(R(0, 1),
-                         R(*float(0.0).as_integer_ratio()))
-        self.assertEqual(R(5, 2),
-                         R(*float(2.5).as_integer_ratio()))
-        self.assertEqual(R(1, 2),
-                         R(*float(0.5).as_integer_ratio()))
-        self.assertEqual(R(4728779608739021, 2251799813685248),
-                         R(*float(2.1).as_integer_ratio()))
-        self.assertEqual(R(-4728779608739021, 2251799813685248),
-                         R(*float(-2.1).as_integer_ratio()))
-        self.assertEqual(R(-2100, 1),
-                         R(*float(-2100.0).as_integer_ratio()))
+        self.assertEqual(R(0, 1), R(*0.0.as_integer_ratio()))
+        self.assertEqual(R(5, 2), R(*2.5.as_integer_ratio()))
+        self.assertEqual(R(1, 2), R(*0.5.as_integer_ratio()))
+        self.assertEqual(
+            R(4728779608739021, 2251799813685248), R(*(2.1).as_integer_ratio())
+        )
+        self.assertEqual(
+            R(-4728779608739021, 2251799813685248), R(*-(2.1).as_integer_ratio())
+        )
+        self.assertEqual(R(-2100, 1), R(*-2100.0.as_integer_ratio()))
 
         self.assertRaises(OverflowError, float('inf').as_integer_ratio)
         self.assertRaises(OverflowError, float('-inf').as_integer_ratio)
@@ -561,7 +559,7 @@ class FormatTestCase(unittest.TestCase):
         #  in particular int specifiers
         for format_spec in ([chr(x) for x in range(ord('a'), ord('z')+1)] +
                             [chr(x) for x in range(ord('A'), ord('Z')+1)]):
-            if not format_spec in 'eEfFgGn%':
+            if format_spec not in 'eEfFgGn%':
                 self.assertRaises(ValueError, format, 0.0, format_spec)
                 self.assertRaises(ValueError, format, 1.0, format_spec)
                 self.assertRaises(ValueError, format, -1.0, format_spec)
@@ -589,7 +587,7 @@ class FormatTestCase(unittest.TestCase):
                 lhs, rhs = map(str.strip, line.split('->'))
                 fmt, arg = lhs.split()
                 self.assertEqual(fmt % float(arg), rhs)
-                self.assertEqual(fmt % -float(arg), '-' + rhs)
+                self.assertEqual(fmt % -float(arg), f'-{rhs}')
 
     def test_issue5864(self):
         self.assertEqual(format(123.456, '.4'), '123.5')
@@ -598,15 +596,14 @@ class FormatTestCase(unittest.TestCase):
 
 class ReprTestCase(unittest.TestCase):
     def test_repr(self):
-        floats_file = open(os.path.join(os.path.split(__file__)[0],
-                           'floating_points.txt'))
-        for line in floats_file:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            v = eval(line)
-            self.assertEqual(v, eval(repr(v)))
-        floats_file.close()
+        with open(os.path.join(os.path.split(__file__)[0],
+                           'floating_points.txt')) as floats_file:
+            for line in floats_file:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                v = eval(line)
+                self.assertEqual(v, eval(repr(v)))
 
     @unittest.skipUnless(getattr(sys, 'float_repr_style', '') == 'short',
                          "applies only when using short float repr style")
@@ -653,7 +650,7 @@ class ReprTestCase(unittest.TestCase):
             ]
 
         for s in test_strings:
-            negs = '-'+s
+            negs = f'-{s}'
             self.assertEqual(s, repr(float(s)))
             self.assertEqual(negs, repr(float(negs)))
             # Since Python 3.2, repr and str are identical
@@ -731,7 +728,7 @@ class RoundTestCase(unittest.TestCase):
             self.assertEqual(float(format(x, '.2f')), round(x, 2))
             self.assertEqual(float(format(x, '.3f')), round(x, 3))
 
-        for i in range(500):
+        for _ in range(500):
             x = random.random()
             self.assertEqual(float(format(x, '.0f')), round(x, 0))
             self.assertEqual(float(format(x, '.1f')), round(x, 1))
@@ -749,8 +746,8 @@ class RoundTestCase(unittest.TestCase):
 
         for fmt in ['%e', '%f', '%g', '%.0e', '%.6f', '%.20g',
                     '%#e', '%#f', '%#g', '%#.20e', '%#.15f', '%#.3g']:
-            pfmt = '%+' + fmt[1:]
-            sfmt = '% ' + fmt[1:]
+            pfmt = f'%+{fmt[1:]}'
+            sfmt = f'% {fmt[1:]}'
             test(fmt, INF, 'inf')
             test(fmt, -INF, '-inf')
             test(fmt, NAN, 'nan')

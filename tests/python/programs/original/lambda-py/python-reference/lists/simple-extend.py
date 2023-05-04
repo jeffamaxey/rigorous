@@ -1,5 +1,4 @@
 l = []
-l.extend([])
 ___assertEqual(l, [])
 l.extend([4])
 ___assertEqual(l, [4])

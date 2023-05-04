@@ -1,6 +1,6 @@
 class M2(type):
-  def __prepare__(name, bases, **kwargs):
-    assert name == "C"
+  def __prepare__(self, bases, **kwargs):
+    assert self == "C"
     assert bases == ()
     assert kwargs["x"] == 5
     assert "metaclass" not in kwargs

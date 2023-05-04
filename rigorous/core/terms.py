@@ -92,19 +92,18 @@ class Term(abc.ABC):
         eliminate_duplicates: bool = False,
         skip_operator_arguments: bool = False,
     ) -> t.Iterator[Term]:
-        if eliminate_duplicates:
-            pending = {self}
-            visited = {self}
-            while pending:
-                term = pending.pop()
-                visited.add(term)
-                yield term
-                if not skip_operator_arguments or not isinstance(term, Apply):
-                    for child in term.children:
-                        if child not in visited:
-                            pending.add(child)
-        else:
+        if not eliminate_duplicates:
             return self.iter_preorder()
+        pending = {self}
+        visited = {self}
+        while pending:
+            term = pending.pop()
+            visited.add(term)
+            yield term
+            if not skip_operator_arguments or not isinstance(term, Apply):
+                for child in term.children:
+                    if child not in visited:
+                        pending.add(child)
 
     def iter_preorder(
         self, *, skip_operator_arguments: bool = False
@@ -203,9 +202,7 @@ class Sequence(Term):
             if element.evaluated is not element:
                 is_inner_evaluated = True
             evaluated_elements.append(element.evaluated)
-        if is_inner_evaluated:
-            return Sequence(tuple(evaluated_elements))
-        return self
+        return Sequence(tuple(evaluated_elements)) if is_inner_evaluated else self
 
     def substitute(self, substitution: Substitution) -> Term:
         return _substitute_inner(self, self.elements, substitution, Sequence)
@@ -342,9 +339,7 @@ def operator(implementation: Implementation) -> FunctionOperator:
 def check_arity(*arities: int) -> t.Callable[[Implementation], Implementation]:
     def decorator(implementation: Implementation) -> Implementation:
         def wrapper(arguments: Arguments) -> t.Optional[Term]:
-            if len(arguments) not in arities:
-                return None
-            return implementation(arguments)
+            return None if len(arguments) not in arities else implementation(arguments)
 
         functools.update_wrapper(wrapper, implementation)
         return wrapper

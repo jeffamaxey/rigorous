@@ -1,10 +1,9 @@
 def genfunc1():
-	rst = []
-	rst.append(0)
+	rst = [0]
 	yield rst
 	rst = 10
 	yield rst
-	for x in range(3):
+	for _ in range(3):
 		rst += 1
 		yield rst
 
@@ -25,8 +24,7 @@ def genfunc2():
 	___assertEqual(a, None)
 	x += 2
 	yield x
-	x = badfunc(x)
-	yield x
+	yield badfunc(x)
 	x = 'end'
 
 g = genfunc2()

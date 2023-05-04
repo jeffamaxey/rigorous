@@ -6,7 +6,8 @@ class A:
 class EE(A):
     def f(self):
         def nested(self):
-            return super().f() + 'E'
+            return f'{super().f()}E'
+
         return nested(5)
 
 # TypeError("super(type, obj): obj must be an instance or subtype of type")

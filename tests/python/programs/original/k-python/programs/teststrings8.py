@@ -1,4 +1,4 @@
-assert ",".join([]) == ""
+assert not ",".join([])
 assert ",".join(["foo"]) == "foo"
 assert ",".join(["foo", "bar", "baz"]) == "foo,bar,baz", ",".join(["foo", "bar", "baz"])
 

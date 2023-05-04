@@ -1,3 +1,2 @@
 class A: pass
-
-assert not not A
+assert A

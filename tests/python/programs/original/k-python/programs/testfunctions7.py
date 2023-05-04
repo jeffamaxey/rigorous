@@ -8,7 +8,8 @@ def g():
   assert x == 5
   def a():
     nonlocal x
-    x = x + 1
+    x += 1
+
   assert a() is None
   assert x == 6
   try:

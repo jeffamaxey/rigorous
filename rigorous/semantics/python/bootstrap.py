@@ -51,9 +51,7 @@ def _populate_class(
                     strings.create(identifier),
                     translator.translate_builtin_function(node),
                 )
-        elif isinstance(node, tree.Pass):
-            pass
-        else:
+        elif not isinstance(node, tree.Pass):
             assert isinstance(node, tree.Assign), f"invalid node {node} in class body"
             target = node.target
             value = node.value
@@ -87,9 +85,12 @@ def _bootstrap() -> heap.Builder:
     for child in basis.runtime_module.children:
         if isinstance(child, blocks.FunctionDefinition):
             docstring: t.Optional[str] = None
-            if child.body and isinstance(child.body[0], tree.Evaluate):
-                if isinstance(child.body[0].expression, tree.String):
-                    docstring = child.body[0].expression.value
+            if (
+                child.body
+                and isinstance(child.body[0], tree.Evaluate)
+                and isinstance(child.body[0].expression, tree.String)
+            ):
+                docstring = child.body[0].expression.value
             lineno = basis.runtime_module.locations[child].row
             runtime.define_runtime_function(
                 child.identifier,

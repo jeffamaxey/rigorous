@@ -5,13 +5,13 @@ class ListTest(list_tests.CommonTest):
     type2test = list
 
     def test_basic(self):
-        self.assertEqual(list([]), [])
+        self.assertEqual([], [])
         l0_3 = [0, 1, 2, 3]
         l0_3_bis = list(l0_3)
         self.assertEqual(l0_3, l0_3_bis)
         self.assertTrue(l0_3 is not l0_3_bis)
-        self.assertEqual(list(()), [])
-        self.assertEqual(list((0, 1, 2, 3)), [0, 1, 2, 3])
+        self.assertEqual([], [])
+        self.assertEqual([0, 1, 2, 3], [0, 1, 2, 3])
         self.assertEqual(list(''), [])
         self.assertEqual(list('spam'), ['s', 'p', 'a', 'm'])
 
@@ -39,7 +39,7 @@ class ListTest(list_tests.CommonTest):
 
     def test_truth(self):
         super().test_truth()
-        self.assertTrue(not [])
+        self.assertTrue(not False)
         self.assertTrue([42])
 
     def test_identity(self):

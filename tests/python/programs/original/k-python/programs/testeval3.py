@@ -1,8 +1,12 @@
-def a(*x): assert x == (); return 5
-def b(**x): assert x == {}; return 5
+def a(*x):
+  assert not x
+  return 5
+def b(**x):
+  assert not x
+  return 5
 def c(*x, **y):
-  assert x == ()
-  assert y == {}
+  assert not x
+  assert not y
   return 5
 
 assert eval(a.__code__) == 5

@@ -1,4 +1,3 @@
-assert True # should succeed
 try:
   assert False # should raise AssertionError
   raise TypeError # should not execute

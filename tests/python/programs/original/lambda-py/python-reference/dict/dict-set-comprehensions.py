@@ -1,4 +1,4 @@
-sc = {x for x in (1, 2, 2, 3)}
+sc = {1, 2, 3}
 s = {1, 2, 3}
 ___assertEqual(sc, s)
 

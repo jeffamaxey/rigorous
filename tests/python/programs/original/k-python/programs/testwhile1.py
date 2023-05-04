@@ -1,6 +1,6 @@
 x = 3
 while x > 0:
-  x = x - 1
+  x -= 1
 else:
   y = 6
   assert x == 0

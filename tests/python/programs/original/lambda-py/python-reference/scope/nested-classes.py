@@ -5,7 +5,7 @@ try:
   class D(object):
    y = x
 except:
- assert True
+ pass
 else:
  assert False 
 

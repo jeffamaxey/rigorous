@@ -56,9 +56,12 @@ def make_runtime_frame(
 ) -> t.Optional[terms.Term]:
     try:
         function = _runtime_functions[name.value]
-        namespace: t.Dict[terms.Term, terms.Term] = {}
-        for parameter, value in zip(function.parameters, arguments.components):
-            namespace[strings.create(parameter)] = value
+        namespace: t.Dict[terms.Term, terms.Term] = {
+            strings.create(parameter): value
+            for parameter, value in zip(
+                function.parameters, arguments.components
+            )
+        }
         return records.create(locals=mappings.create(namespace), body=function.body)
     except KeyError:
         return terms.symbol(f"runtime function {name.value!r} used but not implemented")

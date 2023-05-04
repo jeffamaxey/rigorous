@@ -4,8 +4,8 @@ class A:
     def cm1(cls):
         return cls
     # is just syntactic sugar for:
-    def cm2(cls):
-        return cls
+    def cm2(self):
+        return self
     cm2 = classmethod(cm2)
 
 ___assertEqual(A.cm1(), A)

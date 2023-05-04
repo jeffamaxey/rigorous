@@ -11,7 +11,7 @@ ___assertEqual(C1.dec_attr, "d1")
 
 def d2(cls):
     try:
-        cls.dec_attr = cls.dec_attr + "d2"
+        cls.dec_attr = f"{cls.dec_attr}d2"
     except:
         cls.dec_attr = "d2"
     return cls

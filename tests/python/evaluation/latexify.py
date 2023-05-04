@@ -81,9 +81,7 @@ def main(reports: str, output: str) -> None:
             assert report["type"] == "SOS"
             sos_python_results = report["results"]
 
-    cpython_versions = list(cpython_results.keys())
-    cpython_versions.sort()
-
+    cpython_versions = sorted(cpython_results.keys())
     assert cpython_results, "results for CPython are missing"
     assert lambda_py_results, "results for Lambda-Py are missing"
     assert mopsa_results, "results for Mopsa are missing"

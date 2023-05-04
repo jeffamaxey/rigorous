@@ -1,6 +1,5 @@
 try:
   raise
-  assert False
 except RuntimeError:
   x = 6
 finally:

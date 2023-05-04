@@ -52,11 +52,9 @@ class Executor(interface.Executor[Transition]):
                 target=sos.some_target,
                 environment=environment,
             )
-            transitions = 0
-            for answer in self.system.iter_answers(
+            for transitions, answer in enumerate(self.system.iter_answers(
                 question, depth_first=self.depth_first
-            ):
-                transitions += 1
+            ), start=1):
                 action = answer.substitution[sos.some_action]
                 target = answer.substitution[sos.some_target]
                 yield Transition(

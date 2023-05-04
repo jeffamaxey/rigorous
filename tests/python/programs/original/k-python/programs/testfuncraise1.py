@@ -5,7 +5,6 @@ def b():
     assert x == 5
     x = 6
     raise
-    assert False
   finally:
     assert x == 6
     x = 7

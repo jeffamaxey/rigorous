@@ -1,3 +1,3 @@
-assert bool(0) is False
-assert bool(1) is True
-assert bool() is False
+assert not bool(0)
+assert bool(1)
+assert not bool()

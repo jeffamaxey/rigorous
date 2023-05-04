@@ -7,21 +7,21 @@ class A:
 
 class B(A):
     def f(self):
-        return super().f() + 'B'
+        return f'{super().f()}B'
     @classmethod
     def cm(cls):
         return (cls, super().cm(), 'B')
 
 class C(A):
     def f(self):
-        return super().f() + 'C'
+        return f'{super().f()}C'
     @classmethod
     def cm(cls):
         return (cls, super().cm(), 'C')
 
 class D(C, B):
     def f(self):
-        return super().f() + 'D'
+        return f'{super().f()}D'
     def cm(cls):
         return (cls, super().cm(), 'D')
 
@@ -60,6 +60,7 @@ class EE(A):
     def f(self):
         def nested():
             self
-        return super().f() + 'E'
+
+        return f'{super().f()}E'
 
 ___assertEqual(EE().f(), 'AE')

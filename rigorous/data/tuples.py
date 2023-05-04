@@ -55,16 +55,12 @@ def push_left(this: Tuple, value: terms.Term) -> Tuple:
 
 @terms.function_operator
 def pop(this: Tuple) -> t.Optional[Tuple]:
-    if not this.components:
-        return None
-    return Tuple(this.components[:-1])
+    return Tuple(this.components[:-1]) if this.components else None
 
 
 @terms.function_operator
 def pop_left(this: Tuple) -> t.Optional[Tuple]:
-    if not this.components:
-        return None
-    return Tuple(this.components[1:])
+    return Tuple(this.components[1:]) if this.components else None
 
 
 @terms.function_operator

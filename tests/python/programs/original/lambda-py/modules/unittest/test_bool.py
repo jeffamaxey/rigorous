@@ -20,9 +20,8 @@ class BoolTest(unittest.TestCase):
 
     def test_print(self):
         try:
-            fo = open(support.TESTFN, "w")
-            print(False, True, file=fo)
-            fo.close()
+            with open(support.TESTFN, "w") as fo:
+                print(False, True, file=fo)
             fo = open(support.TESTFN, "r")
             self.assertEqual(fo.read(), 'False True\n')
         finally:
@@ -119,7 +118,7 @@ class BoolTest(unittest.TestCase):
                 self.assertEqual(int(a)^b, int(a)^int(b))
                 self.assertIsNot(int(a)^b, bool(int(a)^int(b)))
 
-        self.assertIs(1==1, True)
+        self.assertIs(True, True)
         self.assertIs(1==0, False)
         self.assertIs(0<1, True)
         self.assertIs(1<0, False)
@@ -130,7 +129,7 @@ class BoolTest(unittest.TestCase):
         self.assertIs(1>=1, True)
         self.assertIs(0>=1, False)
         self.assertIs(0!=1, True)
-        self.assertIs(0!=0, False)
+        self.assertIs(False, False)
 
         x = [1]
         self.assertIs(x is x, True)
@@ -234,9 +233,8 @@ class BoolTest(unittest.TestCase):
 
     def test_fileclosed(self):
         try:
-            f = open(support.TESTFN, "w")
-            self.assertIs(f.closed, False)
-            f.close()
+            with open(support.TESTFN, "w") as f:
+                self.assertIs(f.closed, False)
             self.assertIs(f.closed, True)
         finally:
             os.remove(support.TESTFN)
@@ -318,7 +316,7 @@ class BoolTest(unittest.TestCase):
     def test_sane_len(self):
         # this test just tests our assumptions about __len__
         # this will start failing if __len__ changes assertions
-        for badval in ['illegal', -1, 1 << 32]:
+        for _ in ['illegal', -1, 1 << 32]:
             class A:
                 def __len__(self):
                     return badval

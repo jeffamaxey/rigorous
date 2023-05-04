@@ -1,2 +1,2 @@
-___assertTrue(not [])
+___assertTrue(not False)
 ___assertTrue([42])

@@ -3,7 +3,6 @@ def b():
   try:
     x = 9
     return 5
-    assert False
   finally:
     assert x == 9
     x = 10

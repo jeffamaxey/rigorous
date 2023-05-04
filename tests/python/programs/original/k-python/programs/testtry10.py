@@ -1,7 +1,6 @@
 try:
   try:
     raise
-    assert False
   finally:
     x = 11
   assert False

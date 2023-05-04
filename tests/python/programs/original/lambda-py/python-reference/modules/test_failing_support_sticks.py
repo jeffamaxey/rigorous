@@ -3,27 +3,15 @@
 import sys
 import support
 
-source = support.TESTFN + ".py"
+source = f"{support.TESTFN}.py"
 
-# generate new file
-# try:
-#     f = open(source, "w")
-#     f.write("a = 1 / 0")
-#     f.close()
-# except:
-#     ___assertTrue(False)
-
-f = open(source, "w")
-f.write("a = 1 / 0")
-f.close()
-
-
+with open(source, "w") as f:
+    f.write("a = 1 / 0")
 try:
 # import the new file, which contains a error
     ___assertRaises(ZeroDivisionError, __import__, support.TESTFN);
 # the sys.modules shouldn't contain the TESTFN
     ___assertNotIn(support.TESTFN, sys.modules)
 finally:
-    f = open(source, "w")
-    f.write("")
-    f.close()
+    with open(source, "w") as f:
+        f.write("")

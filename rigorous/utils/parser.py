@@ -87,6 +87,4 @@ class TokenStream(t.Generic[TokenType]):
         )
 
     def accept(self, typ: TokenType) -> t.Optional[Token[TokenType]]:
-        if self.token and self.token.typ is typ:
-            return self.consume()
-        return None
+        return self.consume() if self.token and self.token.typ is typ else None

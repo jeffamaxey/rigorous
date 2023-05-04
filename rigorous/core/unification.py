@@ -24,10 +24,14 @@ class NoSolutionError(Exception):
 def _substitute(
     term: terms.Term, substitution: terms.Substitution
 ) -> terms.Term:
-    for variable in term.variables:
-        if variable in substitution:
-            return term.substitute(substitution)
-    return term
+    return next(
+        (
+            term.substitute(substitution)
+            for variable in term.variables
+            if variable in substitution
+        ),
+        term,
+    )
 
 
 @d.dataclass(eq=False)
@@ -93,9 +97,10 @@ class Solver:
             if left is None or right is None:
                 self._failure = True
                 return
-            if isinstance(right, terms.Variable):
-                if not isinstance(left, terms.Variable):
-                    left, right = right, left
+            if isinstance(right, terms.Variable) and not isinstance(
+                left, terms.Variable
+            ):
+                left, right = right, left
             if isinstance(left, terms.Variable):
                 if left in right.unguarded_variables:
                     self._failure = True

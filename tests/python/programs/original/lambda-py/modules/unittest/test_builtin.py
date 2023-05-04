@@ -32,7 +32,7 @@ class Squares:
         if not 0 <= i < self.max: raise IndexError
         n = len(self.sofar)
         while n <= i:
-            self.sofar.append(n*n)
+            self.sofar.append(n**2)
             n += 1
         return self.sofar[i]
 
@@ -50,7 +50,7 @@ class StrSquares:
             raise IndexError
         n = len(self.sofar)
         while n <= i:
-            self.sofar.append(str(n*n))
+            self.sofar.append(str(n**2))
             n += 1
         return self.sofar[i]
 
@@ -290,7 +290,7 @@ class BuiltinTest(unittest.TestCase):
                           mode='eval', source='0', filename='tmp')
         compile('print("\xe5")\n', '', 'exec')
         self.assertRaises(TypeError, compile, chr(0), 'f', 'exec')
-        self.assertRaises(ValueError, compile, str('a = 1'), 'f', 'bad')
+        self.assertRaises(ValueError, compile, 'a = 1', 'f', 'bad')
 
         # test the optimize argument
 
@@ -304,6 +304,7 @@ class BuiltinTest(unittest.TestCase):
             return (False, f.__doc__)
         '''
         def f(): """doc"""
+
         values = [(-1, __debug__, f.__doc__),
                   (0, True, 'doc'),
                   (1, False, 'doc'),
@@ -710,6 +711,7 @@ class BuiltinTest(unittest.TestCase):
             accu = 0
             for i in v: accu = accu + i
             return accu
+
         self.assertEqual(
             list(map(plus, [1, 3, 7])),
             [1, 3, 7]
@@ -729,22 +731,25 @@ class BuiltinTest(unittest.TestCase):
         def Max(a, b):
             if a is None:
                 return b
-            if b is None:
-                return a
-            return max(a, b)
+            return a if b is None else max(a, b)
+
         self.assertEqual(
             list(map(Max, Squares(3), Squares(2))),
             [0, 1]
         )
         self.assertRaises(TypeError, map)
         self.assertRaises(TypeError, map, lambda x: x, 42)
+
+
         class BadSeq:
             def __iter__(self):
                 raise ValueError
-                yield None
+
+
         self.assertRaises(ValueError, list, map(lambda x: x, BadSeq()))
         def badfunc(x):
             raise RuntimeError
+
         self.assertRaises(RuntimeError, list, map(badfunc, range(5)))
 
     def test_max(self):
@@ -775,8 +780,8 @@ class BuiltinTest(unittest.TestCase):
         self.assertEqual(max((1,2), key=neg), 1)    # two elem iterable
         self.assertEqual(max(1, 2, key=neg), 1)     # two elems
 
-        data = [random.randrange(200) for i in range(100)]
-        keys = dict((elem, random.randrange(50)) for elem in data)
+        data = [random.randrange(200) for _ in range(100)]
+        keys = {elem: random.randrange(50) for elem in data}
         f = keys.__getitem__
         self.assertEqual(max(data, key=f),
                          sorted(reversed(data), key=f)[-1])
@@ -817,8 +822,8 @@ class BuiltinTest(unittest.TestCase):
         self.assertEqual(min((1,2), key=neg), 2)    # two elem iterable
         self.assertEqual(min(1, 2, key=neg), 2)     # two elems
 
-        data = [random.randrange(200) for i in range(100)]
-        keys = dict((elem, random.randrange(50)) for elem in data)
+        data = [random.randrange(200) for _ in range(100)]
+        keys = {elem: random.randrange(50) for elem in data}
         f = keys.__getitem__
         self.assertEqual(min(data, key=f),
                          sorted(data, key=f)[0])
@@ -1004,7 +1009,7 @@ class BuiltinTest(unittest.TestCase):
         except (OSError, AttributeError) as e:
             os.close(r)
             os.close(w)
-            self.skipTest("pty.fork() raised {}".format(e))
+            self.skipTest(f"pty.fork() raised {e}")
         if pid == 0:
             # Child
             try:

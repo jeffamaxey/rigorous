@@ -1,7 +1,7 @@
 class Meta(type):
-  def __new__(self, name, bases, dict):
+  def __new__(cls, name, bases, dict):
     dict.__delitem__("x")
-    return type.__new__(self, name, bases, dict)
+    return type.__new__(cls, name, bases, dict)
 
 x = "global x"
 class C(metaclass=Meta):

@@ -60,8 +60,7 @@ _THROW_PATTERN = actions.create_throw(_THROW_EXCEPTION)
 
 
 def unwrap_throw(action: terms.Term) -> t.Optional[terms.Term]:
-    match = unification.match(_THROW_PATTERN, action)
-    if match:
+    if match := unification.match(_THROW_PATTERN, action):
         return match[_THROW_EXCEPTION]
     else:
         return None
@@ -122,8 +121,7 @@ def run_test(test: pathlib.Path) -> TestResult:
 
     for transition in semantics.executor.iter_transitions(initial_state):
         last_state = transition.target
-        exception = unwrap_throw(transition.action)
-        if exception:
+        if exception := unwrap_throw(transition.action):
             mem, inner = unwrap_memory(transition.target)
             exc_name = mem[mem[exception].getfield("cls")].getfield("name").value  # type: ignore
             return TestResult(test, ResultKind.EXCEPTION_THROWN, exc_name)
@@ -321,8 +319,7 @@ def run_module(executor_name: str, filename: str) -> None:
     if last_transition is not None:
         heap_data, inner = unwrap_memory(last_transition.target)
         print(console.format_term(inner, pretty.renderer),)
-        exception = unwrap_throw(last_transition.action)
-        if exception:
+        if exception := unwrap_throw(last_transition.action):
             print(
                 "Exception:",
                 console.format_term(heap_data.entries[exception], pretty.renderer),

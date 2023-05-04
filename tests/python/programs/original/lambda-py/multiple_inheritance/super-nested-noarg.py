@@ -6,7 +6,8 @@ class A:
 class EE(A):
     def f(self):
         def nested():
-            return super().f() + 'E'
+            return f'{super().f()}E'
+
         return nested()
 
 # SystemError("super(): no arguments")

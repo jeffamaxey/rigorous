@@ -207,9 +207,11 @@ def dict_find_entry(self, key, key_hash):
     length = sequence_length(entries)
     while index < length:
         entry = sequence_get(entries, index)
-        if record_get(entry, LITERAL("hash")) == key_hash:
-            if record_get(entry, LITERAL("key")) == key:
-                return index
+        if (
+            record_get(entry, LITERAL("hash")) == key_hash
+            and record_get(entry, LITERAL("key")) == key
+        ):
+            return index
         index = number_add(index, LITERAL(1))
 
 
@@ -237,11 +239,10 @@ class MappingProxyIterator:
         return self
 
     def __next__(self):
-        if self.__index__ < self.__length__:
-            key = sequence_get(self.__keys__, self.__index__)
-            self.__index__ = number_add(self.__index__, LITERAL(1))
-        else:
+        if self.__index__ >= self.__length__:
             raise StopIteration()
+        key = sequence_get(self.__keys__, self.__index__)
+        self.__index__ = number_add(self.__index__, LITERAL(1))
 
 
 class mappingproxy:
@@ -275,9 +276,7 @@ class mappingproxy:
     def __contains__(self, key):
         key_value = VALUE_OF(key)
         self_value = VALUE_OF(self)
-        if mapping_contains(self_value, key_value):
-            return True
-        return False
+        return bool(mapping_contains(self_value, key_value))
 
 
 # endregion
@@ -523,14 +522,11 @@ def ensure_exception(obj_or_cls, context=None):
     r"""
     Constructs an exception from \verb!obj_or_cls!.
     """
-    if lowlevel_isinstance(obj_or_cls, BaseException):
-        exc = obj_or_cls
-    else:
-        # TODO: check whether this is a subclass of BaseException
-        exc = obj_or_cls()
-    # exc.__context__ = context
-    # exc.__cause__ = cause
-    return exc
+    return (
+        obj_or_cls
+        if lowlevel_isinstance(obj_or_cls, BaseException)
+        else obj_or_cls()
+    )
 
 
 def check_active_exception(cls):
@@ -862,17 +858,9 @@ def rich_cmp(left, right, normal, swapped):
     right_cls = CLS_OF(right)
 
     if left_cls is not right_cls and lowlevel_issubclass(right_cls, left_cls):
-        # let's swap everything
-        tmp = left_cls
-        left_cls = right_cls
-        right_cls = tmp
-        tmp = left
-        left = right
-        right = tmp
-        tmp = normal
-        normal = swapped
-        swapped = tmp
-
+        left_cls, right_cls = right_cls, left_cls
+        left, right = right, left
+        normal, swapped = swapped, normal
     result = NotImplemented
 
     slot = get_cls_slot(left_cls, normal)
@@ -969,11 +957,10 @@ def unpack_iterable(iterable):
     """
     if CLS_OF(iterable) is tuple:
         return VALUE_OF(iterable)
-    else:
-        elements = LITERAL(())
-        for element in iterable:
-            elements = sequence_push(elements, element)
-        return elements
+    elements = LITERAL(())
+    for element in iterable:
+        elements = sequence_push(elements, element)
+    return elements
 
 
 def unpack_str_mapping(mapping):
@@ -1113,10 +1100,7 @@ def cls_get__set__descriptor(cls, name):
                 # If the attribute is not found, a KeyError is constructed on which
                 # the attribute `args` is set. Leading to an infinite recurision. Hence,
                 # we directly access the mappingproxy here.
-                if GET_SLOT(value, "__set__") is None:
-                    return SENTINEL
-                else:
-                    return value
+                return SENTINEL if GET_SLOT(value, "__set__") is None else value
         index = number_add(index, LITERAL(1))
     return SENTINEL
 
@@ -1134,10 +1118,7 @@ def cls_get__delete__descriptor(cls, name):
             mapping = VALUE_OF(attrs)
             if mapping_contains(mapping, name_value):
                 value = mapping_get(mapping, name_value)
-                if GET_SLOT(value, "__delete__") is None:
-                    return SENTINEL
-                else:
-                    return value
+                return SENTINEL if GET_SLOT(value, "__delete__") is None else value
         index = number_add(index, LITERAL(1))
     return SENTINEL
 

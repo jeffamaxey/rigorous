@@ -39,10 +39,10 @@ def explore(
     initial_state = parser.parse_ccs(initial)
     print("Initial State:", pretty.format_process(initial_state))
 
-    binding: t.Dict[terms.Term, terms.Term] = {}
-    for identifier, ccs_term in processes:
-        binding[semantics.ProcessVariable(identifier)] = parser.parse_ccs(ccs_term)
-
+    binding: t.Dict[terms.Term, terms.Term] = {
+        semantics.ProcessVariable(identifier): parser.parse_ccs(ccs_term)
+        for identifier, ccs_term in processes
+    }
     if binding:
         print("\nBinding:")
         for variable, process in binding.items():

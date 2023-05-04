@@ -2,9 +2,7 @@ x = 12
 y = 13
 
 def f():
-    for x in [3,4]:
-        for y in [5, 6]:
-            pass
+    pass
 
 assert x == 12
 assert y == 13

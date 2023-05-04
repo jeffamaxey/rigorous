@@ -96,22 +96,21 @@ def primitive(name: str) -> PrimitiveDecorator:
                         f" {len(arguments)} were given"
                     ),
                 )
-            else:
-                for parameter, argument in zip(signature.parameters, arguments):
-                    if not isinstance(argument, types[parameter]):
-                        return factory.runtime(
-                            "raise_primitive_error",
-                            strings.create(
-                                f"internal error: wrong type of parameter {parameter}"
-                                f" expected {types[parameter]} but got {type(argument)}"
-                            ),
-                        )
-                try:
-                    return function(*arguments)
-                except InvalidOperationError as error:
+            for parameter, argument in zip(signature.parameters, arguments):
+                if not isinstance(argument, types[parameter]):
                     return factory.runtime(
-                        "raise_primitive_error", strings.create(error.reason),
+                        "raise_primitive_error",
+                        strings.create(
+                            f"internal error: wrong type of parameter {parameter}"
+                            f" expected {types[parameter]} but got {type(argument)}"
+                        ),
                     )
+            try:
+                return function(*arguments)
+            except InvalidOperationError as error:
+                return factory.runtime(
+                    "raise_primitive_error", strings.create(error.reason),
+                )
 
         _primitives[name] = Primitive(
             name,

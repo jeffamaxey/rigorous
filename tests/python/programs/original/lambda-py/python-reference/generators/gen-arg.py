@@ -1,6 +1,5 @@
 def f():
-    n = yield 1
-    yield n
+    yield (yield 1)
 
 g = f()
 assert next(g) == 1

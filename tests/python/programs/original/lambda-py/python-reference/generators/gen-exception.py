@@ -1,7 +1,5 @@
 def f():
     raise Exception
-    while True:
-        yield 1
 
 g = f()
 try:

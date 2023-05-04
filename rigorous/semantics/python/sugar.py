@@ -253,56 +253,58 @@ var_alternate = define.variable("alternate", text="sa", math="s_a")
 create_set_item = create_setitem
 
 
-SUGAR = {
-    "load-global": create_load_global(var_identifier),
-    "load-cell": create_load_cell(var_identifier),
-    "load-class-global": create_load_class_global(var_identifier),
-    "load-class-cell": create_load_class_cell(var_identifier),
-    "make-list": create_make_list(var_elements),
-    "make-tuple": create_make_tuple(var_elements),
-    "make-dict": create_make_dict(var_items),
-    "raise-expression": create_raise(var_expression),
-    "raise": create_raise(),
-    "if": create_if(var_condition, var_consequent, var_alternate),
-    "try-finally": create_try_finally(var_body, var_cleanup),
-    "while": create_while(var_condition, var_body, var_alternate),
-    # Assignments
-    "store-global": create_store_global(var_identifier, var_value),
-    "store-cell": create_store_cell(var_identifier, var_value),
-    "store-class": create_store_class(var_identifier, var_value),
-    "set-attribute": create_set_attribute(var_expression, var_attr, var_value),
-    "set-item": create_set_item(var_expression, var_key, var_value),
-    # The `del` Statement
-    "delete-global": create_delete_global(var_identifier),
-    "delete-cell": create_delete_cell(var_identifier),
-    "delete-class": create_delete_class(var_identifier),
-    "delete-attribute": create_delete_attribute(var_expression, var_attr),
-    "delete-item": create_delete_item(var_expression, var_key),
-    # ...
-    "eval-getattr": create_eval_getattr(var_expression, var_attr),
-    "eval-getitem": create_eval_getitem(var_expression, var_item),
-    "eval-not": create_eval_not(var_expression),
-    "keyword-add": create_keyword_add(
-        var_identifier, var_expression, var_keyword_arguments
-    ),
-    "unpack-positional": create_unpack_positional(
-        var_expression, var_positional_arguments
-    ),
-    "unpack-keywords": create_unpack_keywords(var_expression, var_keyword_arguments),
-    "call": create_call(var_function, var_positional_arguments, var_keyword_arguments),
-}
-
-SUGAR.update(
+SUGAR = (
     {
+        "load-global": create_load_global(var_identifier),
+        "load-cell": create_load_cell(var_identifier),
+        "load-class-global": create_load_class_global(var_identifier),
+        "load-class-cell": create_load_class_cell(var_identifier),
+        "make-list": create_make_list(var_elements),
+        "make-tuple": create_make_tuple(var_elements),
+        "make-dict": create_make_dict(var_items),
+        "raise-expression": create_raise(var_expression),
+        "raise": create_raise(),
+        "if": create_if(var_condition, var_consequent, var_alternate),
+        "try-finally": create_try_finally(var_body, var_cleanup),
+        "while": create_while(var_condition, var_body, var_alternate),
+        # Assignments
+        "store-global": create_store_global(var_identifier, var_value),
+        "store-cell": create_store_cell(var_identifier, var_value),
+        "store-class": create_store_class(var_identifier, var_value),
+        "set-attribute": create_set_attribute(
+            var_expression, var_attr, var_value
+        ),
+        "set-item": create_set_item(var_expression, var_key, var_value),
+        # The `del` Statement
+        "delete-global": create_delete_global(var_identifier),
+        "delete-cell": create_delete_cell(var_identifier),
+        "delete-class": create_delete_class(var_identifier),
+        "delete-attribute": create_delete_attribute(var_expression, var_attr),
+        "delete-item": create_delete_item(var_expression, var_key),
+        # ...
+        "eval-getattr": create_eval_getattr(var_expression, var_attr),
+        "eval-getitem": create_eval_getitem(var_expression, var_item),
+        "eval-not": create_eval_not(var_expression),
+        "keyword-add": create_keyword_add(
+            var_identifier, var_expression, var_keyword_arguments
+        ),
+        "unpack-positional": create_unpack_positional(
+            var_expression, var_positional_arguments
+        ),
+        "unpack-keywords": create_unpack_keywords(
+            var_expression, var_keyword_arguments
+        ),
+        "call": create_call(
+            var_function, var_positional_arguments, var_keyword_arguments
+        ),
+    }
+    | {
         f"binary-{operator.method}": create_eval_binary(
             operator, var_expression_left, var_expression_right
         )
         for operator in operators.BinaryOperator
     }
-)
-
-SUGAR.update(
-    {
+    | {
         f"unary-{operator.method}": create_eval_unary(operator, var_expression)
         for operator in operators.UnaryOperator
     }

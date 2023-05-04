@@ -2,7 +2,6 @@ def e(foo):
   assert foo == 5
   try:
     return
-    yield
   except StopIteration:
     assert False
 

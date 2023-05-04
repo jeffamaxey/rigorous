@@ -12,9 +12,7 @@ def check_iterator(it, seq):
 
 # Helper to check that a for loop generates a given sequence
 def check_for_loop(expr, seq):
-    res = []
-    for val in expr:
-        res.append(val)
+    res = list(expr)
     ___assertEqual(res, seq)
 
 # Test basic use of iter() function

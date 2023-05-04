@@ -1,7 +1,7 @@
 def __import__(name, globals=None, locals=None, fromlist=(), level=0):
+
   class A: pass
-  a = A()
-  return a
+  return A()
 
 import builtins
 builtins.__import__ = __import__

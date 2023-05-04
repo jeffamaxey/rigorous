@@ -18,8 +18,8 @@ class DictTest(unittest.TestCase):
 
     def test_constructor(self):
         # calling built-in types without argument must return empty
-        self.assertEqual(dict(), {})
-        self.assertIsNot(dict(), {})
+        self.assertEqual({}, {})
+        self.assertIsNot({}, {})
 
     def test_literal_constructor(self):
         # check literal constructor for different sized dicts
@@ -33,7 +33,7 @@ class DictTest(unittest.TestCase):
             self.assertEqual(eval(dictliteral), dict(items))
 
     def test_bool(self):
-        self.assertIs(not {}, True)
+        self.assertIs(not False, True)
         self.assertTrue({1: 2})
         self.assertIs(bool({}), False)
         self.assertIs(bool({1: 2}), True)
@@ -102,12 +102,10 @@ class DictTest(unittest.TestCase):
             def __hash__(self):
                 return 24
 
-        d = {}
-        d[BadEq()] = 42
+        d = {BadEq(): 42}
         self.assertRaises(KeyError, d.__getitem__, 23)
 
         class Exc(Exception): pass
-
         class BadHash(object):
             fail = False
             def __hash__(self):
@@ -129,10 +127,7 @@ class DictTest(unittest.TestCase):
         self.assertRaises(TypeError, d.clear, None)
 
     def test_update(self):
-        d = {}
-        d.update({1:100})
-        d.update({2:20})
-        d.update({1:1, 2:2, 3:3})
+        d = {1: 100, 2: 20} | {1:1, 2:2, 3:3}
         self.assertEqual(d, {1:1, 2:2, 3:3})
 
         d.update()
@@ -148,11 +143,10 @@ class DictTest(unittest.TestCase):
             def __getitem__(self, i):
                 return self.d[i]
         d.clear()
-        d.update(SimpleUserDict())
+        d |= SimpleUserDict()
         self.assertEqual(d, {1:1, 2:2, 3:3})
 
         class Exc(Exception): pass
-
         d.clear()
         class FailingUserDict:
             def keys(self):
@@ -314,7 +308,7 @@ class DictTest(unittest.TestCase):
                         b[repr(i)] = i
                 if copymode > 0:
                     b = a.copy()
-                for i in range(size):
+                for _ in range(size):
                     ka, va = ta = a.popitem()
                     self.assertEqual(va, int(ka))
                     kb, vb = tb = b.popitem()
@@ -327,10 +321,8 @@ class DictTest(unittest.TestCase):
         self.assertRaises(KeyError, d.popitem)
 
     def test_pop(self):
-        # Tests for pop with specified key
-        d = {}
         k, v = 'abc', 'def'
-        d[k] = v
+        d = {k: v}
         self.assertRaises(KeyError, d.pop, 'ghi')
 
         self.assertEqual(d.pop(k), v)
@@ -345,7 +337,6 @@ class DictTest(unittest.TestCase):
         self.assertRaises(TypeError, d.pop)
 
         class Exc(Exception): pass
-
         class BadHash(object):
             fail = False
             def __hash__(self):
@@ -361,8 +352,7 @@ class DictTest(unittest.TestCase):
 
     def test_mutatingiteration(self):
         # changing dict size during iteration
-        d = {}
-        d[1] = 1
+        d = {1: 1}
         with self.assertRaises(RuntimeError):
             for i in d:
                 d[i+1] = 1
@@ -410,8 +400,8 @@ class DictTest(unittest.TestCase):
     def helper_keys_contained(self, fn):
         # Test rich comparisons against dict key views, which should behave the
         # same as sets.
-        empty = fn(dict())
-        empty2 = fn(dict())
+        empty = fn({})
+        empty2 = fn({})
         smaller = fn({1:1, 2:2})
         larger = fn({1:1, 2:2, 3:3})
         larger2 = fn({1:1, 2:2, 3:3})
@@ -567,6 +557,7 @@ class DictTest(unittest.TestCase):
 
     def test_bad_key(self):
         # Dictionary lookups should fail if __eq__() raises an exception.
+
         class CustomException(Exception):
             pass
 
@@ -579,10 +570,9 @@ class DictTest(unittest.TestCase):
                     raise CustomException
                 return other
 
-        d = {}
         x1 = BadDictKey()
         x2 = BadDictKey()
-        d[x1] = 1
+        d = {x1: 1}
         for stmt in ['d[x2] = 2',
                      'z = d[x2]',
                      'x2 in d',
@@ -594,16 +584,7 @@ class DictTest(unittest.TestCase):
                 exec(stmt, locals())
 
     def test_resize1(self):
-        # Dict resizing bug, found by Jack Jansen in 2.2 CVS development.
-        # This version got an assert failure in debug build, infinite loop in
-        # release build.  Unfortunately, provoking this kind of stuff requires
-        # a mix of inserts and deletes hitting exactly the right hash codes in
-        # exactly the right order, and I can't think of a randomized approach
-        # that would be *likely* to hit a failing case in reasonable time.
-
-        d = {}
-        for i in range(5):
-            d[i] = i
+        d = {i: i for i in range(5)}
         for i in range(5):
             del d[i]
         for i in range(5, 9):  # i==8 was the problem
@@ -613,6 +594,7 @@ class DictTest(unittest.TestCase):
         # Another dict resizing bug (SF bug #1456209).
         # This caused Segmentation faults or Illegal instructions.
 
+
         class X(object):
             def __hash__(self):
                 return 5
@@ -620,13 +602,8 @@ class DictTest(unittest.TestCase):
                 if resizing:
                     d.clear()
                 return False
-        d = {}
         resizing = False
-        d[X()] = 1
-        d[X()] = 2
-        d[X()] = 3
-        d[X()] = 4
-        d[X()] = 5
+        d = {X(): 5}
         # now trigger a resize
         resizing = True
         d[9] = 6
@@ -688,11 +665,12 @@ class DictTest(unittest.TestCase):
     @support.cpython_only
     def test_track_dynamic(self):
         # Test GC-optimization of dynamically-created dicts
+
         class MyObject(object):
             pass
         x, y, z, w, o = 1.5, "a", (1, object()), [], MyObject()
 
-        d = dict()
+        d = {}
         self._not_tracked(d)
         d[1] = "a"
         self._not_tracked(d)
@@ -708,11 +686,8 @@ class DictTest(unittest.TestCase):
         self._not_tracked(d)
         self._not_tracked(d.copy())
 
-        # dd isn't tracked right now, but it may mutate and therefore d
-        # which contains it must be tracked.
-        d = dict()
-        dd = dict()
-        d[1] = dd
+        dd = {}
+        d = {1: dd}
         self._not_tracked(dd)
         self._tracked(d)
         dd[1] = d
@@ -720,20 +695,20 @@ class DictTest(unittest.TestCase):
 
         d = dict.fromkeys([x, y, z])
         self._not_tracked(d)
-        dd = dict()
-        dd.update(d)
+        dd = {}
+        dd |= d
         self._not_tracked(dd)
         d = dict.fromkeys([x, y, z, o])
         self._tracked(d)
-        dd = dict()
-        dd.update(d)
+        dd = {}
+        dd |= d
         self._tracked(dd)
 
         d = dict(x=x, y=y, z=z)
         self._not_tracked(d)
         d = dict(x=x, y=y, z=z, w=w)
         self._tracked(d)
-        d = dict()
+        d = {}
         d.update(x=x, y=y, z=z)
         self._not_tracked(d)
         d.update(w=w)
@@ -743,8 +718,8 @@ class DictTest(unittest.TestCase):
         self._not_tracked(d)
         d = dict([(x, y), (z, w)])
         self._tracked(d)
-        d = dict()
-        d.update([(x, y), (z, 1)])
+        d = {}
+        d |= [(x, y), (z, 1)]
         self._not_tracked(d)
         d.update([(x, y), (z, w)])
         self._tracked(d)

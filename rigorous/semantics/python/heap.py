@@ -229,8 +229,7 @@ class Builder:
             self.next_address += 1
         else:
             address = None
-        reference = references.Reference(name=name, address=address)
-        return reference
+        return references.Reference(name=name, address=address)
 
     def clone(self) -> Builder:
         return Builder(_memory=dict(self.memory), _next_address=self.next_address)

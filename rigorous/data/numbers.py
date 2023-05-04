@@ -97,7 +97,4 @@ def bitwise_xor(left: Integer, right: Integer) -> Integer:
 
 
 def create(value: t.Union[int, float]) -> Number:
-    if isinstance(value, int):
-        return Integer(value)
-    else:
-        return Float(value)
+    return Integer(value) if isinstance(value, int) else Float(value)

@@ -57,11 +57,11 @@ def _parse_action(stream: parser.TokenStream[TokenType]) -> terms.Term:
         return sos.ACTION_TAU
     elif token is not None and stream.accept(TokenType.COM_ACTION):
         name = terms.symbol(token.match.group("action_name"))
-        if token.match.group("action_modifier") == "!":
-            action = semantics.generative_action(name)
-        else:
-            action = semantics.reactive_action(name)
-        return action
+        return (
+            semantics.generative_action(name)
+            if token.match.group("action_modifier") == "!"
+            else semantics.reactive_action(name)
+        )
     else:
         raise CCSSyntaxError(f"expected action but found {token or 'EOF'}")
 
@@ -102,9 +102,8 @@ def _parse_binary(
                 action_set.add(_parse_action(stream))
                 if stream.accept(TokenType.COMMA):
                     continue
-                else:
-                    stream.expect(TokenType.RIGHT_BRACE)
-                    break
+                stream.expect(TokenType.RIGHT_BRACE)
+                break
             left = semantics.restrict(left, sets.create(action_set))
         else:
             right = _parse_binary(stream, _BINARY_OPERATORS[operator.typ] + 1)

@@ -57,8 +57,7 @@ _THROW_PATTERN = actions.create_throw(_THROW_EXCEPTION)
 
 
 def unwrap_throw(action: terms.Term) -> t.Optional[terms.Term]:
-    match = unification.match(_THROW_PATTERN, action)
-    if match:
+    if match := unification.match(_THROW_PATTERN, action):
         return match[_THROW_EXCEPTION]
     else:
         return None
@@ -157,7 +156,7 @@ def run_test(test: programs.TestCase) -> Result:
         return Result(
             test.identifier,
             stdout="",
-            stderr=f"Timeout!",
+            stderr="Timeout!",
             returncode=1,
             exception="",
             message="",

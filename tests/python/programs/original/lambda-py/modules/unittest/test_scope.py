@@ -130,15 +130,22 @@ class ScopeTests(unittest.TestCase):
 
         def test():
             method_and_var = "var"
+
+
             class Test:
                 def method_and_var(self):
                     return "method"
+
                 def test(self):
                     return method_and_var
+
                 def actual_global(self):
-                    return str("global")
+                    return "global"
+
                 def str(self):
                     return str(self)
+
+
             return Test()
 
         t = test()
@@ -147,16 +154,22 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(t.actual_global(), "global")
 
         method_and_var = "var"
+
+
         class Test:
             # this class is not nested, so the rules are different
             def method_and_var(self):
                 return "method"
+
             def test(self):
                 return method_and_var
+
             def actual_global(self):
-                return str("global")
+                return "global"
+
             def str(self):
                 return str(self)
+
 
         t = Test()
         self.assertEqual(t.test(), "var")
@@ -178,10 +191,8 @@ class ScopeTests(unittest.TestCase):
 
         def f(x):
             def fact(n):
-                if n == 0:
-                    return 1
-                else:
-                    return n * fact(n - 1)
+                return 1 if n == 0 else n * fact(n - 1)
+
             if x >= 0:
                 return fact(x)
             else:
@@ -537,7 +548,7 @@ class ScopeTests(unittest.TestCase):
             kind, des = getter
             if kind == 1:       # AV happens when stepping from this line to next
                 if des == "":
-                    des = "_%s__%s" % (klass.__name__, name)
+                    des = f"_{klass.__name__}__{name}"
                 return lambda obj: getattr(obj, des)
 
         class TestClass:

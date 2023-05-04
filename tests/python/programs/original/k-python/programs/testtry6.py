@@ -5,7 +5,6 @@ try:
   except NameError as e:
     x = 8
     raise
-    assert False
 except NameError as f:
   try:
     e

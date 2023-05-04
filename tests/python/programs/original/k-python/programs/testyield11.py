@@ -1,7 +1,6 @@
 def a():
   yield 5
   raise TypeError
-  yield 6
 
 b=a()
 

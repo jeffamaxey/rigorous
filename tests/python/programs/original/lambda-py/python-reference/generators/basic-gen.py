@@ -8,10 +8,7 @@ ___assertEqual(2, next(g))
 ___assertRaises(StopIteration, next, g)
 
 def f():
-	x = 0
-	while x < 5:
-		yield x
-		x += 1
+	yield from range(5)
 
 g = f()
 # generator object should return itself when calling iter

@@ -1,5 +1,5 @@
 x = 10
-l = [x for x in range(5)]
+l = list(range(5))
 ___assertEqual(x, 10)
 
 try:

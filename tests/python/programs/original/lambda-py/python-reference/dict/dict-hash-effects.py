@@ -11,11 +11,11 @@ class O():
     return 5
 
   def __eq__(self, other):
-    eqcalls.append(self.msg + " == " + other.msg)
+    eqcalls.append(f"{self.msg} == {other.msg}")
     return self is other
 
   def __cmp__(self, other):
-    cmpcalls.append(self.msg + " == " + other.msg)
+    cmpcalls.append(f"{self.msg} == {other.msg}")
     return id(self) - id(other)
 
 d = {}

@@ -1,5 +1,5 @@
 class Foo:
-    def __getitem__(*a):
+    def __getitem__(self):
         return 0
 
 foo = Foo()

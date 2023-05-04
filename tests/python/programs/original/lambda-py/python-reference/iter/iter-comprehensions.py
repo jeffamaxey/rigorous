@@ -16,8 +16,7 @@ seq = range(3)
 res = []
 for i in iter(seq):
     for j in iter(seq):
-        for k in iter(seq):
-            res.append((i, j, k))
+        res.extend((i, j, k) for k in iter(seq))
 ___assertEqual(res, TRIPLETS)
 
 seq = range(3)

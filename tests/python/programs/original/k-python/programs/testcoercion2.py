@@ -4,10 +4,7 @@ class A:
 class B(A):
   def __init__(self, x): self.x = x
   def __gt__(self, other):
-    if self.x == 5:
-      return NotImplemented
-    else:
-      return False
+    return NotImplemented if self.x == 5 else False
 
 a = A()
 b1 = B(1)

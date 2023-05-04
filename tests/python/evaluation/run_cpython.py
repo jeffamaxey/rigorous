@@ -44,7 +44,7 @@ def get_python_version(executable: str) -> str:
     ).decode("utf-8")
     match = re.search(r"([0-9]+)\.([0-9]+)\.([0-9]+)", output)
     assert match is not None, output
-    return match.group(0)
+    return match[0]
 
 
 def run_test(executable: str, test: programs.TestCase) -> Result:

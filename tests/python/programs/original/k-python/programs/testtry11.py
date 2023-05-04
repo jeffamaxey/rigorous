@@ -1,7 +1,6 @@
 try:
   try:
     raise
-    assert False
   except RuntimeError:
     raise SyntaxError
   assert False
